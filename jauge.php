@@ -9,7 +9,7 @@
 require ('functions.php');
 $baseUrl = 'https://'.$_SERVER[HTTP_HOST]. dirname($_SERVER['PHP_SELF']);
 // $url = $baseUrl.'/getArticles.php';
-$apiUrl = "https://api.archives-ouvertes.fr/crac/hal?q=*:*&fq=submitType_s:file&fq=submittedDate_tdate:[2021-03-01T00:00:00Z%20TO%202021-03-21T00:00:00Z]&rows=0&facet=true&facet.field=status_i&facet.mincount=1&wt=json";
+$apiUrl = "https://api.archives-ouvertes.fr/crac/hal?q=*:*&fq=submitType_s:file&fq=submittedDate_tdate:[2021-05-24T00:00:00Z%20TO%202021-06-11T24:00:00Z]&rows=0&facet=true&facet.field=status_i&facet.mincount=1&wt=json";
 $results = getApi($apiUrl);
 $jsonResults = json_decode($results);
 // $nbOnlineDocs = $jsonResults->facet_counts->facet_fields->status_i[1];
@@ -45,9 +45,12 @@ $nbOnlineDocs = $jsonResults->response->numFound;
 	@media screen and (min-width: 768px){
 	    #casuhalathon-counters{
 			margin: 0 auto;
-			width: 600px;
+			/* width: 600px;
 			height: 500px;
-			font-size: 12px;
+			font-size: 12px; */
+			width: 700px;
+			height: 600px;
+			font-size: 15px;
 		}
 	}
 
@@ -56,9 +59,12 @@ $nbOnlineDocs = $jsonResults->response->numFound;
 	@media screen and (min-width: 1200px){
 		#casuhalathon-counters{
 			margin: 0 auto;
-			width: 700px;
+			/* width: 700px;
 			height: 600px;
-			font-size: 16px;
+			font-size: 16px; */
+			width: 800px;
+			height: 700px;
+			font-size: 19px;
 		}
 	}
 	
@@ -72,12 +78,13 @@ window.onload = function()
      *  fonction d'affichage du texte sous le décompte
      */
 	function drawText(nbDocs, text1, text2){
-		ctx.textAlign = 'left';
+		ctx.textAlign = 'right';
         ctx.fillStyle = orangeColor;
         ctx.font = "bold " + 2.4*fontSize + "px Arial ";
-        ctx.fillText(nbDocs, xpos, ypos + 1.1*fontSize);
+        ctx.fillText(nbDocs, xpos+fontSize*7, ypos + 1*fontSize);
 
         //ajout du texte à droite du nombre de docs
+		ctx.textAlign = 'left';
         ctx.font = " bold "+ 1.1*fontSize +"px Arial";
         ctx.fillText(text1, xpos + 7.5*fontSize, ypos );
         ctx.fillText(text2, xpos + 7.5*fontSize, ypos + 1.1*fontSize);
@@ -467,7 +474,7 @@ window.onload = function()
 				
 				//récupération des résultats et affectation aux variables de l'animation
 				nbOnlineDocs = response.response.numFound;
-				nbOnlineDocs = 15000;
+				// nbOnlineDocs = 15000;
 				
 				//on réinitialise la jauge et le nombre d'animations du cadenas et le nombre de docs dans l'api
 				jaugeLevel = 0;
@@ -635,7 +642,7 @@ window.onload = function()
 }
 </script>
 
-<?php	if (empty($nbOnlineDocs)): ?>
+<?php	if (!isset($nbOnlineDocs)): ?>
 			<p>Aucune donnée disponible pour le moment</p>
 <?php 	else : ?>
 			<div id="casuhalathon-counters">
