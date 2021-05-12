@@ -25,6 +25,16 @@ $averageGraduation = 7000;
 //niveau de la jauge pour l'objectif halathon à dépasser
 $goalGraduation = 10000;
 
+/** paramètres du texte */
+$docsText1 = 'fichiers déposés';
+$docsText2 = "dans HAL";
+$textTime = 'Temps restant';
+$firstLimitText1 = 'dépôts moyens dans HAL';
+$firstLimitText2 = 'sur une période de 3 semaines';
+$secondLimitText1 = 'OBJECTIF';
+$secondLimitText2 = 'HALATHON';
+
+
 /** paramètres animation de la jauge */
 //interval pour faire monter la jauge
 $jaugeStep = 100;
@@ -573,14 +583,14 @@ window.onload = function()
 		var jaugeHeight = H/100*80;
         var jaugeWidth = W/100*18;
 
-		var nbOnlineDocs = <?= $nbOnlineDocs ?>;
-		var docsText1 = 'fichiers déposés';
-		var docsText2 = "dans HAL";
-		var textTime = 'Temps restant';
-		var firstLimitText1 = 'dépôts moyens dans HAL';
-		var firstLimitText2 = 'sur une période de 3 semaines';
-		var secondLimitText1 = 'OBJECTIF';
-		var secondLimitText2 = 'HALATHON';
+		var nbOnlineDocs = "<?= $nbOnlineDocs ?>";
+		var docsText1 = "<?= $docsText1 ?>";
+		var docsText2 = "<?= $docsText2 ?>";
+		var textTime = "<?= $textTime ?>";
+		var firstLimitText1 = "<?= $firstLimitText1 ?>";
+		var firstLimitText2 = "<?= $firstLimitText2 ?>";
+		var secondLimitText1 = "<?= $secondLimitText1 ?>";
+		var secondLimitText2 = "<?= $secondLimitText2 ?>";
 
 		//déclage de la bordure par rapport au cadre pour l'ombre et les coins arrondis
 		var offset = 8;
