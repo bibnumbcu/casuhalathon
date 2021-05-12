@@ -484,7 +484,7 @@ window.onload = function()
 				
 				//récupération des résultats et affectation aux variables de l'animation
 				nbOnlineDocs = response.response.numFound;
-				 nbOnlineDocs = 15000;
+				//  nbOnlineDocs = 15000;
 				
 				//on réinitialise la jauge et le nombre d'animations du cadenas et le nombre de docs dans l'api
 				jaugeLevel = 0;
