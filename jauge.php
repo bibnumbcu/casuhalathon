@@ -36,6 +36,8 @@ $firstLimitText1 = 'dépôts moyens dans HAL';
 $firstLimitText2 = 'sur une période de 3 semaines';
 $secondLimitText1 = 'OBJECTIF';
 $secondLimitText2 = 'HALATHON';
+//ce paramètre peut rester vide
+$secondLimitText3 = '';
 
 
 /** paramètres animation de la jauge */
@@ -207,7 +209,7 @@ window.onload = function()
 
 				//reinit de la couleur du texte la plus courante
 				ctx.fillStyle = darkColor;
-console.log(graduationViewStep);
+				
 				//pour certains echelons on a un tracé différent
 				if (i%graduationViewStep==0 || i*graduationStep==averageGraduation ||
 				 i*graduationStep==goalGraduation
@@ -230,6 +232,8 @@ console.log(graduationViewStep);
 						ctx.fillText(firstLimitText1, xpos + jaugeWidth + 10, ypos - (yStep*i) - 5);
 						ctx.fillText(firstLimitText2, xpos + jaugeWidth + 10, ypos - (yStep*i) + 5);
 						
+
+						
 						//Variables pour l'affichage du chiffre de graduation à gauche de la jauge
 						fontSizeRate = .8;
 						fontType = "normal";
@@ -244,9 +248,15 @@ console.log(graduationViewStep);
 							ctx.fillStyle = orangeColor;
 						}
 						ctx.textAlign = 'left'; 
-						ctx.fillText(secondLimitText1, xpos + jaugeWidth + 10, ypos - (yStep*i) - fontSize*0.1);
-						ctx.fillText(secondLimitText2, xpos + jaugeWidth + 10, ypos - (yStep*i) + fontSize*1.2);
-						
+						if (secondLimitText3 != ''){
+							ctx.fillText(secondLimitText1, xpos + jaugeWidth + 10, ypos - (yStep*i) - fontSize*.8);
+							ctx.fillText(secondLimitText2, xpos + jaugeWidth + 10, ypos - (yStep*i) + fontSize*.4);
+							ctx.fillText(secondLimitText3, xpos + jaugeWidth + 10, ypos - (yStep*i) + fontSize*1.7);
+						}
+						else{
+							ctx.fillText(secondLimitText1, xpos + jaugeWidth + 10, ypos - (yStep*i) - fontSize*0.1);
+							ctx.fillText(secondLimitText2, xpos + jaugeWidth + 10, ypos - (yStep*i) + fontSize*1.2);
+						}
 						ctx.lineTo(xpos + jaugeWidth/3 , ypos - (yStep*i));
 						ctx.moveTo(xpos + jaugeWidth*2/3, ypos - (yStep*i));
 						ctx.lineTo(xpos + jaugeWidth , ypos - (yStep*i));
@@ -595,6 +605,7 @@ console.log(graduationViewStep);
 		var firstLimitText2 = "<?= $firstLimitText2 ?>";
 		var secondLimitText1 = "<?= $secondLimitText1 ?>";
 		var secondLimitText2 = "<?= $secondLimitText2 ?>";
+		var secondLimitText3 = "<?= $secondLimitText3 ?>";
 
 		//déclage de la bordure par rapport au cadre pour l'ombre et les coins arrondis
 		var offset = 8;
