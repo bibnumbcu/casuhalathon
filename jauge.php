@@ -25,6 +25,9 @@ $averageGraduation = 7000;
 //niveau de la jauge pour l'objectif halathon à dépasser
 $goalGraduation = 10000;
 
+//afficher le chiffre des graduations tous les 5 échelons ou tous les 10 échelons
+$graduationViewStep = 5;
+
 /** paramètres du texte */
 $docsText1 = 'fichiers déposés';
 $docsText2 = "dans HAL";
@@ -170,7 +173,8 @@ window.onload = function()
 			var grd = ctx.createLinearGradient(xpos, ypos+jaugeWidth/2, xpos, ypos-(jaugeLevel*jaugeHeight/maxJaugeLevel));
 			grd.addColorStop(0, "#1F8288");
 			var jaugePercent = jaugeLevel/maxJaugeLevel;
-			// console.log(jaugeLevel);
+			
+			
 			if (jaugePercent >= 0 && jaugePercent<.28){
 				grd.addColorStop(1, "#4EA145");
 			}
@@ -203,9 +207,9 @@ window.onload = function()
 
 				//reinit de la couleur du texte la plus courante
 				ctx.fillStyle = darkColor;
-
+console.log(graduationViewStep);
 				//pour certains echelons on a un tracé différent
-				if (i%5==0 || i*graduationStep==averageGraduation ||
+				if (i%graduationViewStep==0 || i*graduationStep==averageGraduation ||
 				 i*graduationStep==goalGraduation
 				 || i*graduationStep==maxJaugeLevel){
 					//pour ajuster les différentes largeurs des chiffres de la graduation
@@ -216,7 +220,7 @@ window.onload = function()
 					var fontSizeRate = 1;
 
 					//traçage des graduations
-					if (i%5==0){
+					if (i%graduationViewStep==0){
 						ctx.lineTo(xpos + 20 , ypos - (yStep*i));
 					}
 					if (i*graduationStep==averageGraduation){
@@ -605,7 +609,7 @@ window.onload = function()
 		var shadowColor = "<?= $shadowColor ?>";
 
 		/**
-		* init valeur de remplissage de la jauge
+		* paramètres de la jauge
 		*/
 		var jaugeLevel = 0;
 		var maxJaugeLevel = <?= $maxJaugeLevel ?>;
@@ -614,6 +618,7 @@ window.onload = function()
 		var averageGraduation = <?= $averageGraduation ?>;
 		var goalGraduation = <?= $goalGraduation ?>;
 		var jaugeStep = <?= $jaugeStep ?>;
+		var graduationViewStep = <?= $graduationViewStep ?>;
 
 		//calcul du pas entre les graduations		
 		var yStep = jaugeHeight/nbGraduations;
