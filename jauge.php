@@ -1,20 +1,47 @@
 <?php
-/**
- * script d'interrogation de l'api de hal, afin de récupérer :
- * * les articles de revues publiés en 2020 qui sont des références avec fichier ou qui sont des références sans fichiers mais qui ont un accès externe au texte
- * * les articles de revues publiés en 2020 qui sont des références sans fichiers et qui n'ont pas d'accès externe au texte
- */
 
 
 require ('functions.php');
 $baseUrl = 'https://'.$_SERVER[HTTP_HOST]. dirname($_SERVER['PHP_SELF']);
-// $url = $baseUrl.'/getArticles.php';
+
+/**
+ * paramètres de la jauge
+ */
+//url de l'api
 $apiUrl = "https://api.archives-ouvertes.fr/crac/hal?q=*:*&fq=submitType_s:file&fq=submittedDate_tdate:[2021-05-24T00:00:00Z%20TO%202021-06-11T24:00:00Z]&rows=0&facet=true&facet.field=status_i&facet.mincount=1&wt=json";
+
+//limite maximal de la jauge
+$maxJaugeLevel = 14000;
+
+//date de fin du casuhalathon
+$countDownDate = "Jun 11, 2021 24:00:00";
+
+//interval entre deux graduations de la jauge
+$graduationStep = 1000;
+
+//niveau de la jauge pour le taux moyen de publication
+$averageGraduation = 7000;
+
+//niveau de la jauge pour l'objectif halathon à dépasser
+$goalGraduation = 10000;
+
+/** paramètres animation de la jauge */
+//interval pour faire monter la jauge
+$jaugeStep = 100;
+
+//interval de temps (em milisecondes) pour faire monter la jauge
+$animationInterval = 30;
+
+//couleurs
+$orangeColor = "#dd7226";
+$darkColor = "#515151";
+$shadowColor = "#777";
+
+
+
 $results = getApi($apiUrl);
 $jsonResults = json_decode($results);
-// $nbOnlineDocs = $jsonResults->facet_counts->facet_fields->status_i[1];
 $nbOnlineDocs = $jsonResults->response->numFound;
-// $nbOnlineDocs = 2000;
 ?>
 
 <style>
@@ -160,15 +187,17 @@ window.onload = function()
 			ctx.strokeStyle = darkColor;
 
 			
-			for (i=1 ; i<15 ; i++){
+			for (i=1 ; i<(nbGraduations+1) ; i++){
 				//placement au bon echelon
 				ctx.moveTo(xpos, ypos - (yStep*i));
 
 				//reinit de la couleur du texte la plus courante
 				ctx.fillStyle = darkColor;
 
-				//si on est l'échelon 5, 7 ou 10 ou 14 on a un tracé différent
-				if (i==5 || i==7 || i==10 || i==14){
+				//pour certains echelons on a un tracé différent
+				if (i%5==0 || i*graduationStep==averageGraduation ||
+				 i*graduationStep==goalGraduation
+				 || i*graduationStep==maxJaugeLevel){
 					//pour ajuster les différentes largeurs des chiffres de la graduation
 					var textAlign = "right";
 					var fontType = "bold";
@@ -177,10 +206,10 @@ window.onload = function()
 					var fontSizeRate = 1;
 
 					//traçage des graduations
-					if (i==5){
+					if (i%5==0){
 						ctx.lineTo(xpos + 20 , ypos - (yStep*i));
 					}
-					if (i==7){
+					if (i*graduationStep==averageGraduation){
 						//affichage du text à droite de la jauge
 						ctx.font =  "normal " + (fontSize * 0.6) +"px Arial ";
 						ctx.textAlign = 'left'; 
@@ -194,10 +223,10 @@ window.onload = function()
 						
 						
 					}
-					if (i==10){
+					if (i*graduationStep==goalGraduation){
 						//affichage du text à droite de la jauge
 						ctx.font =  "bold " + (fontSize * 1.2) +"px Arial ";
-						if (jaugeLevel>=10000){
+						if (jaugeLevel>=goalGraduation){
 							ctx.fillStyle = orangeColor;
 						}
 						ctx.textAlign = 'left'; 
@@ -210,14 +239,12 @@ window.onload = function()
 						fontSizeRate = 1.5;
 						
 					}
-					if (i==14){
-					}
-
-					//Affichage des pourcentages à gauche des graduations
 					
+
+					//Affichage des pourcentages à gauche des graduations					
 					ctx.font =  fontType + " " + (fontSize * fontSizeRate) +"px Arial ";
 					ctx.textAlign = textAlign; 
-					ctx.fillText(1000*i, xpos-(.5*fontSize), ypos - (yStep*i) + 5);
+					ctx.fillText(graduationStep*i, xpos-(.5*fontSize), ypos - (yStep*i) + 5);
 				}
 				else{
 					//traçage de la ligne
@@ -230,8 +257,8 @@ window.onload = function()
 
 			//traçage de la ligne pointillée qui ne peut pas être tracée en même temps que les autres
 			ctx.setLineDash([5, 5]);
-			ctx.moveTo(xpos, ypos - (yStep*7));
-			ctx.lineTo(xpos + jaugeWidth , ypos - (yStep*7));
+			ctx.moveTo(xpos, ypos - (yStep*averageGraduation/graduationStep));
+			ctx.lineTo(xpos + jaugeWidth , ypos - (yStep*averageGraduation/graduationStep));
 			ctx.stroke();
 			ctx.setLineDash([]);
 	}
@@ -254,15 +281,6 @@ window.onload = function()
 
 		}
 		ctx.strokeStyle = color;
-		
-
-		//début du tracé en bas à gauche
-        // xpos = xpos + offset;
-        // ypos = ypos - offset;
-        
-		//largeur et hauteur du cadre
-		// var borderWidth =  W - (2*offset);
-		// var borderHeight = H - (2*offset);
 
         //traçage de la bordure
 		ctx.beginPath();
@@ -336,9 +354,6 @@ window.onload = function()
 		// ctx.lineTo(xpos + radius  , ypos - borderHeight);
 		ctx.lineTo(xpos + (3*borderWidth/4)+ radius  , ypos - borderHeight);
 
-		
-
-
 		//ligne haute 2eme partie
 		ctx.moveTo(xpos + borderWidth/4, ypos-borderHeight);
 		ctx.lineTo(xpos + radius  , ypos - borderHeight);
@@ -351,8 +366,6 @@ window.onload = function()
 		
 		//coin arrondi en bas à gauche
 		ctx.arcTo(xpos, ypos, xpos + radius, ypos, radius);
-
-
 
 		//traçage de la ligne
 		ctx.stroke();
@@ -417,8 +430,6 @@ window.onload = function()
 		//effacement du canvas
         ctx.clearRect(0, 0, W, H);
 
-		//drawCanvasBorder();
-				
         /**
         *   affichage des textes
          */
@@ -429,7 +440,6 @@ window.onload = function()
         //traçage du texte
         drawText(nbOnlineDocsLevel, docsText1, docsText2);
 
-		       		
 		/**
         *   traçage de la jauge
          */
@@ -441,12 +451,12 @@ window.onload = function()
 		
 		
 		// affichage du logo openaccess
-		if (jaugeLevel < 10000){
-			ctx.drawImage(cadenas, xpos + jaugeWidth/2 - .75*fontSize + cadenasPosX , ypos - (yStep*10) - 1.2*fontSize, 1.5*fontSize, 2*fontSize);
+		if (jaugeLevel < goalGraduation){
+			ctx.drawImage(cadenas, xpos + jaugeWidth/2 - .75*fontSize + cadenasPosX , ypos - (yStep*goalGraduation/graduationStep) - 1.2*fontSize, 1.5*fontSize, 2*fontSize);
 		}
 		//affichage du logo succes
-		else if (jaugeLevel >=10000){
-			ctx.drawImage(success, xpos + jaugeWidth*2+10 - .75*fontSize , ypos - (yStep*10) - 1.1*fontSize, 2*fontSize, 2.5*fontSize);
+		else if (jaugeLevel >=goalGraduation){
+			ctx.drawImage(success, xpos + jaugeWidth*2+10 - .75*fontSize , ypos - (yStep*goalGraduation/graduationStep) - 1.1*fontSize, 2*fontSize, 2.5*fontSize);
 		}
 		
 
@@ -474,7 +484,7 @@ window.onload = function()
 				
 				//récupération des résultats et affectation aux variables de l'animation
 				nbOnlineDocs = response.response.numFound;
-				// nbOnlineDocs = 15000;
+				 nbOnlineDocs = 15000;
 				
 				//on réinitialise la jauge et le nombre d'animations du cadenas et le nombre de docs dans l'api
 				jaugeLevel = 0;
@@ -482,7 +492,7 @@ window.onload = function()
 				cadenasCountAnimate = 0;
 
 				//déclenchement de l'animation toutes les 30 millisecondes
-				animation_loop = setInterval(animate_jauge, 40 );
+				animation_loop = setInterval(animate_jauge, animationInterval );
 			}
 		};
 		request.open("GET", "<?= $apiUrl ?>");
@@ -496,20 +506,19 @@ window.onload = function()
 	{
 		//if (jaugeLevel > nbOnlineDocs) clearInterval(animation_loop);
 		if (jaugeLevel < nbOnlineDocs){
-		 	jaugeLevel += 100;
+		 	jaugeLevel += jaugeStep;
 		}
 
 		if (jaugeLevel >= maxJaugeLevel)
 			jaugeLevel = maxJaugeLevel;
 			
 		if(nbOnlineDocsLevel < nbOnlineDocs)
-			nbOnlineDocsLevel = nbOnlineDocsLevel + 100;
+			nbOnlineDocsLevel = nbOnlineDocsLevel + jaugeStep;
 		else
 			nbOnlineDocsLevel = nbOnlineDocs;
 
 
 			
-		// console.log(jaugeLevel);
 		/**
 		*  Calcul et affichage des valeurs du countDown
 		*/
@@ -525,13 +534,7 @@ window.onload = function()
 		minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
 		seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-		// // If the count down is finished, write some text
-		// if (distance < 0) {
-		// clearInterval(x);
-		// document.getElementById("demo").innerHTML = "EXPIRED";
-		// }
-		// }, 1000);
-		if (jaugeLevel >8000 && jaugeLevel <=10000 && cadenasCountAnimate<15){
+		if (jaugeLevel > goalGraduation - 2*graduationStep && jaugeLevel <= goalGraduation && cadenasCountAnimate<15){
 			if (cadenasMvment){
 				cadenasPosX += 3;
 				cadenasMvment = false;
@@ -566,6 +569,9 @@ window.onload = function()
 			
 		var animation_loop, redraw_loop;
 
+		//taille de la jauge
+		var jaugeHeight = H/100*80;
+        var jaugeWidth = W/100*18;
 
 		var nbOnlineDocs = <?= $nbOnlineDocs ?>;
 		var docsText1 = 'fichiers déposés';
@@ -584,25 +590,35 @@ window.onload = function()
 		var xpos = 0;
 		var ypos = 0;
 
-		var orangeColor = "#dd7226";
-		var darkColor = "#515151";
-		var shadowColor = "#777";
+		var orangeColor = "<?= $orangeColor ?>";
+		var darkColor = "<?= $darkColor ?>";
+		var shadowColor = "<?= $shadowColor ?>";
 
-		//init valeur de remplissage de la jauge
+		/**
+		* init valeur de remplissage de la jauge
+		*/
 		var jaugeLevel = 0;
-		var maxJaugeLevel = 14000;
-		// var finaljaugeLevel = Math.round(nbOnlineDocs * 100 / nbArticles);
-		
+		var maxJaugeLevel = <?= $maxJaugeLevel ?>;
+		var graduationStep = <?= $graduationStep ?>;
+		var nbGraduations = Math.floor(maxJaugeLevel / graduationStep);
+		var averageGraduation = <?= $averageGraduation ?>;
+		var goalGraduation = <?= $goalGraduation ?>;
+		var jaugeStep = <?= $jaugeStep ?>;
+
+		//calcul du pas entre les graduations		
+		var yStep = jaugeHeight/nbGraduations;
+
+
+		//params animation cadenas
 		var cadenasMvment = false;
 		var cadenasPosX = 0;
 		var cadenasCountAnimate = 0;
 
-		//taille de la jauge
-		var jaugeHeight = H/100*80;
-        var jaugeWidth = W/100*18;
+		//animation interval
+		animationInterval = <?= $animationInterval ?>;
 
 		// Date de fin pour le décompte du compteur
-		var countDownDate = new Date("Jun 11, 2021 24:00:00").getTime();
+		var countDownDate = new Date("<?= $countDownDate ?>").getTime();
 		var now = new Date().getTime();
 
 		// Find the distance between now and the count down date
@@ -616,8 +632,7 @@ window.onload = function()
 
 		
 
-		//calcul du pas entre les graduations		
-		var yStep = jaugeHeight/14;
+		
 
 		//images
 		var cadenas = new Image();
@@ -635,7 +650,6 @@ window.onload = function()
 		/* Crée une boucle sur la fonction draw() avec un intervalle de 30 secondes */
 		redraw_loop = setInterval(draw, 30000);
 
-		// init();
 	}
 
 
