@@ -14,7 +14,7 @@ $apiUrl = "https://api.archives-ouvertes.fr/crac/hal?q=*:*&fq=submitType_s:file&
 $maxJaugeLevel = 14000;
 
 //date de fin du casuhalathon
-$countDownDate = "Jun 11, 2021 24:00:00";
+$countDownDate = "2021-06-11T24:00:00";
 
 //interval entre deux graduations de la jauge
 $graduationStep = 1000;
