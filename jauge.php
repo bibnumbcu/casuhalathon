@@ -551,12 +551,21 @@ window.onload = function()
 
 		// Find the distance between now and the count down date
 		distance = countDownDate - now;
+		
+		if( (distance < 0) ){
+			days = '00';
+			hours = '00';
+			minutes = '00';
+			seconds = '00';
+		}
+		else{
+			// Time calculations for days, hours, minutes and seconds
+			days = Math.floor(distance / (1000 * 60 * 60 * 24));
+			hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+			minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+			seconds = Math.floor((distance % (1000 * 60)) / 1000);
+		}
 
-		// Time calculations for days, hours, minutes and seconds
-		days = Math.floor(distance / (1000 * 60 * 60 * 24));
-		hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-		minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-		seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
 		if (jaugeLevel > goalGraduation - 2*graduationStep && jaugeLevel <= goalGraduation && cadenasCountAnimate<15){
 			if (cadenasMvment){
@@ -674,7 +683,8 @@ window.onload = function()
 		draw();
 		
 		/* Crée une boucle sur la fonction draw() avec un intervalle de 30 secondes */
-		redraw_loop = setInterval(draw, 30000);
+		if (now < countDownDate )
+			redraw_loop = setInterval(draw, 30000);
 
 	}
 
